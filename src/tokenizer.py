@@ -1,7 +1,8 @@
 class Tokenizer:
-    def __init__(self):
+    def __init__(self, verbose=0):
         self.max_token = 255
-        self.tokens = []
+        self.verbose = verbose
+        self.tokens = None
 
     def get_stats(self, text=None):
         if text:
@@ -21,31 +22,18 @@ class Tokenizer:
                 max_pair = pair
                 max_pair_value = pair_value
         
-        return max_pair    
-
-    # @staticmethod
-    # def print_info(func):
-    #     def wrapper(self, *args, **kwargs):
-    #         print(f"Vocabulary before: {self.vocabulary}")
-    #         print(f"Length before: {len(self.int_tokens)}")
-    #         result = func(self, *args, **kwargs)
-    #         print(f"Vocabulary after: {self.vocabulary}")
-    #         print(f"Length after: {len(self.int_tokens)}")
-    #         return result
-    #     return wrapper
-
-    # @print_info
+        return max_pair
 
     def merge(self, pair, text=None):
         if text:
             self.tokens = list(int(token) for token in text.encode('utf-8'))
         merged_tokens = []
         i = 0
-
+        self.max_token+=1
+        
         while i < len(self.tokens) - 1:
             
-            if pair == (self.tokens[i], self.tokens[i+1]):
-                self.max_token+=1    
+            if pair == (self.tokens[i], self.tokens[i+1]):   
                 merged_tokens.append(self.max_token)
                 i+=2
             else:
@@ -55,12 +43,36 @@ class Tokenizer:
         return merged_tokens
 
     def train(self, text:str, merges:int):
-        self.tokens = list(int(token) for token in text.encode('utf-8'))
-        for _ in range(len(merges)):
-            pair = self.get_stats()    
-            self.merge(pair)    
+        if self.tokens is None:
+            self.tokens = list(int(token) for token in text.encode('utf-8'))
         
+        if self.verbose==1:
+            len_before = len(self.tokens)
+            vocab_size_before = self.max_token + 1
+            print('-'*100, f'length before: {len_before}, vocab size before: {vocab_size_before}', sep='\n')
+
+        for _ in range(merges):
+            pair = self.get_stats()
+            self.merge(pair)
+        
+        if self.verbose==1:
+            len_after = len(self.tokens)
+            vocab_size_after = self.max_token + 1
+            print('-'*20,(f'length after: {len_after}, vocab size after: {vocab_size_after},\n' 
+                  f'length decrease: {len_before-len_after}, vocab size increase: {vocab_size_after - vocab_size_before}\n'
+                  f'length decrease: {len_before/len_after:.2f}x, ' 
+                  f'vocab size increase: {vocab_size_after/vocab_size_before:.2f}x'), sep='\n')
+
         return self.tokens
 
-tokenizer = Tokenizer()
-tokenizer.get_stats(text)
+# Tests
+
+if __name__ == '__main__':
+    text = open('src/data/unicode_diverse.txt').read()
+    
+    tokenizer = Tokenizer(verbose=1)
+    tokenizer.train(text, 100)
+    
+    text = open('src/data/TinyShakespeare.txt').read()
+    tokenizer = Tokenizer(verbose=1)
+    tokenizer.train(text, 200)
