@@ -20,16 +20,15 @@ Train your tokenizer on whatever text you like and visualize the merged tokens. 
 
 Convert you `BasicTokenizer` into a `RegexTokenizer`, which takes a regex pattern and splits the text exactly as GPT-4 would. Process the parts separately as before, then concatenate the results. Retrain your tokenizer and compare the results before and after. You should see that you will now have no tokens that go across categories (numbers, letters, punctuation, more than one whitespace). Use the GPT-4 pattern:
 
-```
+```python
 GPT4_SPLIT_PATTERN = r"""'(?i:[sdmt]|ll|ve|re)|[^\r\n\p{L}\p{N}]?+\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]++[\r\n]*|\s*[\r\n]|\s+(?!\S)|\s+"""
 ```
-
 
 ### Step 3
 
 You're now ready to load the merges from the GPT-4 tokenizer and show that your tokenizer produces the identical results for both `encode` and `decode`, matching [tiktoken](https://github.com/openai/tiktoken).
 
-```
+```python
 # match this
 import tiktoken
 enc = tiktoken.get_encoding("cl100k_base") # this is the GPT-4 tokenizer
@@ -46,7 +45,7 @@ Unfortunately, you will run into two issues:
 
 (Optional, irritating, not obviously useful) Add the ability to handle special tokens. You'll then be able to match the output of tiktoken even when special tokens are present, e.g.:
 
-```
+```python
 import tiktoken
 enc = tiktoken.get_encoding("cl100k_base") # this is the GPT-4 tokenizer
 ids = enc.encode("<|endoftext|>hello world", allowed_special="all")
