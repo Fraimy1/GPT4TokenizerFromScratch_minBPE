@@ -6,15 +6,15 @@ Build your own GPT-4 Tokenizer!
 
 Write the `BasicTokenizer` class, with the following three core functions:
 
-- `def train(self, text, vocab_size, verbose=False)` - already done
-- `def decode(self, ids)` - done
+- `def train(self, text, vocab_size, verbose=False)` - done
+- `def decode(self, ids)`
 - `def encode(self, text)`
 
-Take out the train and decode functionality out of the initialization into a train function.
+~~Take out the train and decode functionality out of the initialization into a train function.~~ - done
 
-Review the code. Make sure everything is optimized and clear.
+~~Review the code. Make sure everything is optimized and clear.~~ - done
 
-Train your tokenizer on whatever text you like and visualize the merged tokens. Do they look reasonable? One default test you may wish to use is the text file ~~`tests/taylorswift.txt`~~ `TinyShakespeare.txt will do`.
+Train your tokenizer on whatever text you like and visualize the merged tokens. Do they look reasonable? One default test you may wish to use is the text file ~~`tests/taylorswift.txt`~~ `TinyShakespeare.txt`.
 
 ### Step 2
 

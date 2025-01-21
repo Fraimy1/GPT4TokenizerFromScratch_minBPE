@@ -2,6 +2,7 @@ class Tokenizer:
     def __init__(self, verbose=0):
         self.max_token = 255
         self.verbose = verbose
+        self.vocabulary = {i : chr(i) for i in range(256)}
         self.tokens = None
 
     def get_stats(self, text=None):
@@ -30,7 +31,7 @@ class Tokenizer:
         merged_tokens = []
         i = 0
         self.max_token+=1
-        
+        self.vocabulary[self.max_token] = self.vocabulary[pair[0]] + self.vocabulary[pair[1]]
         while i < len(self.tokens) - 1:
             
             if pair == (self.tokens[i], self.tokens[i+1]):   
@@ -64,15 +65,44 @@ class Tokenizer:
                   f'vocab size increase: {vocab_size_after/vocab_size_before:.2f}x'), sep='\n')
 
         return self.tokens
+    
+    def decode(self, tokens:list[int]):
+        output = ''
+        for token in tokens:
+            output+= self.vocabulary[token]
+        
+        return output
+    
+    def encode(self, text:str):
+        vocabulary = self.vocabulary.copy()
+        vocabulary = dict(list(vocabulary.items())[::-1])
+        text_bytes = bytes(text.encode('utf-8'))
+        tokens = []
+        i = 0
+        while i<len(text_bytes):
+            for token, translation in vocabulary.items():
+                if text_bytes[i:].startswith(bytes(translation.encode('utf-8'))):
+                    tokens.append(token)
+                    i+=len(translation)
+                    break
+        return tokens
+                
+
 
 # Tests
 
 if __name__ == '__main__':
-    text = open('src/data/unicode_diverse.txt').read()
+    # text = open('src/data/unicode_diverse.txt').read()
     
-    tokenizer = Tokenizer(verbose=1)
-    tokenizer.train(text, 100)
+    # tokenizer = Tokenizer(verbose=1)
+    # tokens = tokenizer.train(text, 700)
+
+    # print(tokenizer.decode(tokens))
     
     text = open('src/data/TinyShakespeare.txt').read()
     tokenizer = Tokenizer(verbose=1)
-    tokenizer.train(text, 200)
+    tokens = tokenizer.train(text, 100)
+    
+    print(tokenizer.decode(tokens)[:1000])
+    print(tokenizer.encode(text[:1000]))
+
